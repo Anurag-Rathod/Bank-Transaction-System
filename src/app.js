@@ -21,7 +21,3 @@ app.use("/api/transactions", transactionRoutes);
 console.log("1");
 
 export default app;
-
-//grddCft976cTjGjZ
-//anuragrathod999_db_user
-//mongodb+srv://<db_username>:grddCft976cTjGjZ@cluster0.jpnmvnj.mongodb.net/
