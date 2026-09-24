@@ -32,15 +32,7 @@ async function authSystemUserMiddleware(req, res, next) {
             message: "Unauthorized access, token is missing"
         })
     }
-
-    // const isBlacklisted = await tokenBlackListModel.findOne({ token })
-
-    // if (isBlacklisted) {
-    //     return res.status(401).json({
-    //         message: "Unauthorized access, token is invalid"
-    //     })
-    // }
-
+    
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
