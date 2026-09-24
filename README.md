@@ -99,28 +99,6 @@ Retry with Same Key
 Duplicate Transaction Prevented
 ```
 
-## 🔐 Authentication
-
-The application uses JWT-based authentication.
-
-```text
-Login
-  ↓
-JWT Generated
-  ↓
-Authentication Cookie
-  ↓
-Protected API Request
-  ↓
-JWT Verification Middleware
-  ↓
-Authenticated User
-```
-
-Passwords are hashed using **bcrypt** before being stored in the database.
-
-On logout, the JWT is added to a blacklist and the authentication cookie is cleared.
-
 ## 🛠️ Tech Stack
 
 **Backend:** Node.js, Express.js  
