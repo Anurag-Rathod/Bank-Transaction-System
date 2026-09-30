@@ -6,98 +6,20 @@ This project focuses on real-world backend concepts such as **JWT authentication
 
 ## 🚀 Features
 
-- User registration, login, and logout
-- JWT-based authentication and authorization
-- Password hashing using bcrypt
-- Account creation and management
-- Account balance calculation using MongoDB Aggregation
-- Ledger-based debit and credit tracking
-- Secure money transfers between accounts
-- MongoDB transactions for atomic operations
-- Idempotency to prevent duplicate transactions
-- JWT token blacklisting on logout
-- Account status validation
-- System-user authorization for initial funds
-- Transaction and registration email notifications
+- 👤 **User Authentication** — Supports user registration, login, and logout using JWT-based authentication.
+- 🔐 **Secure Password Storage** — Hashes passwords using `bcrypt` before storing them in MongoDB.
+- 🏦 **Account Management** — Supports bank account creation, account status validation, and account management.
+- 💰 **Ledger-Based Accounting** — Tracks debit and credit entries through a transaction ledger instead of directly modifying balances.
+- 📊 **Balance Calculation** — Calculates account balances using MongoDB aggregation pipelines.
+- 💸 **Secure Money Transfers** — Supports transfers between accounts with sender balance and account status validation.
+- 🔄 **MongoDB Transactions** — Uses database transactions to ensure atomic and consistent money transfers.
+- ♻️ **Idempotent Transactions** — Uses unique idempotency keys to prevent duplicate money transfers during request retries.
+- 🚫 **JWT Token Blacklisting** — Invalidates tokens during logout to prevent further unauthorized access.
+- 🛡️ **Authorization & Validation** — Protects sensitive operations through authentication, authorization, and account validation.
+- 📧 **Email Notifications** — Sends registration and transaction-related notifications using Nodemailer and Gmail OAuth2.
+- 🧑‍💻 **API Testing** — APIs can be tested using Postman.
 
-## 🏗️ Architecture
-
-```text
-Client / Postman
-       ↓
-Express.js Server
-       ↓
-Routes
-       ↓
-Authentication Middleware
-       ↓
-Controllers
-       ↓
-Mongoose Models
-       ↓
-MongoDB
-       ↓
-Email Service
-```
-
-## 💸 Transaction Flow
-
-```text
-Validate Request
-       ↓
-Idempotency Check
-       ↓
-Validate Accounts
-       ↓
-Check Sender Balance
-       ↓
-Create Transaction (PENDING)
-       ↓
-Create DEBIT Ledger Entry
-       ↓
-Create CREDIT Ledger Entry
-       ↓
-Mark Transaction COMPLETED
-       ↓
-Commit MongoDB Transaction
-       ↓
-Send Email Notification
-```
-
-## 📒 Ledger-Based Balance
-
-The application uses a **ledger-based approach** instead of directly maintaining the account balance.
-
-For every transfer:
-
-```text
-Sender Account   → DEBIT  ₹500
-Receiver Account → CREDIT ₹500
-```
-
-The account balance is calculated as:
-
-```text
-Balance = Total Credits - Total Debits
-```
-
-MongoDB Aggregation is used to calculate the total debit and credit amounts from the ledger entries.
-
-## 🔄 Idempotency
-
-Each transfer request contains a unique `idempotencyKey`.
-
-If a request is retried because of a network failure, the same idempotency key prevents the transaction from being processed twice.
-
-```text
-First Request
-     ↓
-Transaction Created
-
-Retry with Same Key
-     ↓
-Duplicate Transaction Prevented
-```
+---
 
 ## 🛠️ Tech Stack
 
@@ -108,6 +30,132 @@ Duplicate Transaction Prevented
 **API Testing:** Postman  
 **Tools:** Git, GitHub, VS Code
 
+---
+
+## 🏗️ Backend Architecture
+
+    Client / Postman
+           │
+           ▼
+    Express.js Server
+           │
+           ▼
+         Routes
+           │
+           ▼
+    Authentication Middleware
+           │
+           ▼
+       Controllers
+           │
+           ▼
+      Service / Logic
+           │
+           ▼
+     Mongoose Models
+           │
+           ▼
+        MongoDB
+           │
+           └──────────────► Email Service
+                            (Nodemailer)
+
+---
+
+## 💸 Transaction Flow
+
+    Transfer Request
+           │
+           ▼
+    Validate Request
+           │
+           ▼
+    Check Idempotency Key
+           │
+           ▼
+    Validate Sender & Receiver
+           │
+           ▼
+    Check Account Status
+           │
+           ▼
+    Check Sender Balance
+           │
+           ▼
+    Create Transaction
+        (PENDING)
+           │
+           ▼
+    Create DEBIT Ledger Entry
+           │
+           ▼
+    Create CREDIT Ledger Entry
+           │
+           ▼
+    Mark Transaction
+      COMPLETED
+           │
+           ▼
+    Commit MongoDB Transaction
+           │
+           ▼
+    Send Email Notification
+
+---
+
+## 📒 Ledger-Based Accounting
+
+The application follows a **ledger-based accounting model** instead of directly storing and updating the account balance.
+
+For every successful transfer, corresponding debit and credit entries are recorded:
+
+    Sender Account
+          │
+          └── DEBIT  ₹500
+
+    Receiver Account
+          │
+          └── CREDIT ₹500
+
+The account balance is calculated using:
+
+    Balance = Total Credits - Total Debits
+
+MongoDB aggregation pipelines are used to calculate the total debit and credit amounts from ledger entries.
+
+This approach provides a clear transaction history and helps maintain a reliable record of account activity.
+
+---
+
+## 🔄 Idempotency
+
+Money transfer requests require a unique `idempotencyKey`.
+
+The idempotency mechanism ensures that retrying the same request does not create duplicate transactions.
+
+    First Request
+          │
+          ▼
+    Idempotency Key Stored
+          │
+          ▼
+    Transaction Processed
+          │
+          ▼
+    Transaction Completed
+
+
+    Retry with Same Key
+          │
+          ▼
+    Existing Transaction Found
+          │
+          ▼
+    Duplicate Transaction Prevented
+
+This is especially useful when a client retries a request because of a network timeout or temporary connection failure.
+
+---
 
 ## 📌 Key Backend Concepts
 
@@ -123,14 +171,3 @@ Duplicate Transaction Prevented
 - Middleware-based Authentication
 - Transaction Error Handling
 - Email Integration
-
-## 🚀 Future Improvements
-
-- Transaction history with pagination
-- Complete transaction reversal workflow
-- Stronger account ownership validation
-- Improved concurrency handling
-- Centralized error handling
-- Background job processing for emails
-- Rate limiting
-- Automated unit and integration testing
