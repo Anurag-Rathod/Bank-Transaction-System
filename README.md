@@ -1,4 +1,4 @@
-# 🏦 Banking Transaction Backend
+# 🏦 Bank Transaction System
 
 A backend application for managing users, bank accounts, and secure money transfers using **Node.js, Express.js, MongoDB, and Mongoose**.
 
